@@ -15,7 +15,7 @@ m = df1['num_rating'].quantile(0.6)
 q_items = df1.copy().loc[df1['num_rating'] >= m]
 
 def create_soup(x):
-    tags = x['tags'].lower().split(', ')
+    tags = x['tags'].lower().split(',')
     tags.extend(x['title'].lower().split())
     tags.extend(x['category'].lower().split())
     return " ".join(sorted(set(tags), key=tags.index))
@@ -62,17 +62,16 @@ def get_latest_user_orders(user_id, orders, num_orders=3):
 
 
 # utility function that returns a DataFrame given the food_indices to be recommended
-def get_recomms_df(food_indices, df1, columns, comment):
+def get_recomms_df(food_indices, df1, columns):
     row = 0
     df = pd.DataFrame(columns=columns)
     for i in food_indices:
-        df.loc[row] = df1[['title', 'price']].loc[i]
-        df.loc[row].comment = comment
+        df.loc[row] = df1[['title', 'price', 'food_id']].loc[i]
         row = row + 1
     return df
 
 # return food_indices for accomplishing personalized recommendation using Count Vectorizer
-def personalised_recomms(orders, df1, user_id, columns, comment="based on your past orders"):
+def personalised_recomms(orders, df1, user_id, columns):
     order_indices = get_latest_user_orders(user_id, orders)
     food_ids = []
     food_indices = []
@@ -83,12 +82,13 @@ def personalised_recomms(orders, df1, user_id, columns, comment="based on your p
         food_indices.append(indices_from_food_id[i])
     for i in food_indices:
         recomm_indices.extend(get_recommendations(idx=i))
-    return get_recomms_df(set(recomm_indices), df1, columns, comment)
+    return get_recomms_df(set(recomm_indices), df1, columns)
 
 
 orders = pd.read_json(str(sys.argv[1]), encoding='utf-8')
-columns = ['title', 'price', 'comment']
+columns = ['title', 'price', 'food_id']
 current_user = 2
+
 per = personalised_recomms(orders, df1, current_user, columns)
 
 print(per.to_json(orient='records',force_ascii=False))

@@ -12,7 +12,7 @@ module.exports = {
       .digest("hex");
     await client.connect();
     const collection = client.db("FoodeeDatabase").collection("admin");
-    const query = { username: username, password: hashPassword };
+    const query = { user_name: username, password: hashPassword };
     const result = await collection.findOne(query);
     client.close();
     return result;
