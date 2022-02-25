@@ -71,6 +71,7 @@ module.exports = {
         const result = await ShopModal.updateShopAvg({
           shop_id,
           avg: avg / data.length,
+          products: data.length,
         });
       }
       return res.send({ message: "Thêm sản phẩm thành công", code: 0 });
@@ -96,11 +97,16 @@ module.exports = {
     if (result && result.acknowledged) {
       const data = await ShopModal.getListProduct(shop_id);
       if (data.length == 0) {
-        const result = await ShopModal.updateShopAvg({ shop_id, avg: 0 });
+        const result = await ShopModal.updateShopAvg({
+          shop_id,
+          avg: 0,
+          products: data.length,
+        });
       } else if (data.length == 1) {
         const result = await ShopModal.updateShopAvg({
           shop_id,
           avg: data[0].price,
+          products: data.length,
         });
       } else {
         let avg = 0;
@@ -110,6 +116,7 @@ module.exports = {
         const result = await ShopModal.updateShopAvg({
           shop_id,
           avg: avg / data.length,
+          products: data.length,
         });
       }
       return res.send({ message: "Thêm sản phẩm thành công", code: 0 });
@@ -136,6 +143,7 @@ module.exports = {
         const result = await ShopModal.updateShopAvg({
           shop_id,
           avg: avg / data.length,
+          products: data.length,
         });
       }
       return res.send({ message: "Thành công", code: 0 });

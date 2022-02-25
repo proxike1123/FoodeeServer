@@ -41,6 +41,7 @@ module.exports = {
       shop_id: uuidv4(),
       info: false,
       lock: false,
+      products: 0,
     };
     const result = await collection.insertOne(query);
     console.log(result);
@@ -134,6 +135,7 @@ module.exports = {
     var newvalues = {
       $set: {
         avg_price: data.avg,
+        products: data.products,
       },
     };
 

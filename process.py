@@ -21,6 +21,7 @@ def create_soup(x):
     return " ".join(sorted(set(tags), key=tags.index))
 df1['soup'] = df1.apply(create_soup, axis=1)
 df1.head(3)
+
 # create the count matrix
 count = CountVectorizer()
 # df1['soup']
@@ -41,7 +42,7 @@ def get_recommendations(title="", cosine_sim=cosine_sim, idx=-1):
     # Sort the dishes based on the similarity scores
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     # Get the scores of the 10 most similar dishes
-    sim_scores = sim_scores[1:3]
+    sim_scores = sim_scores[0:3]
     # Get the food indices
     food_indices = [i[0] for i in sim_scores]
     # Return the top 10 most similar dishes
@@ -59,7 +60,6 @@ def get_latest_user_orders(user_id, orders, num_orders=3):
             break
 
     return order_indices
-
 
 # utility function that returns a DataFrame given the food_indices to be recommended
 def get_recomms_df(food_indices, df1, columns):

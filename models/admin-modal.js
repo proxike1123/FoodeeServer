@@ -17,4 +17,66 @@ module.exports = {
     client.close();
     return result;
   },
+  getShopList: async () => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("agency");
+    const result = await collection.find({}).toArray();
+    client.close();
+    return result;
+  },
+  updateShopStatus: async (data) => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("agency");
+
+    var myquery = { shop_id: data.shop_id };
+    var newvalues = {
+      $set: {
+        lock: data.status,
+      },
+    };
+    const result = await collection.updateOne(myquery, newvalues);
+    client.close();
+    return result;
+  },
+  getShopDetail: async (shop_id) => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("agency");
+    const result = await collection.findOne({
+      shop_id: shop_id,
+    });
+    client.close();
+    return result;
+  },
+  getShopProduct: async (shop_id) => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("product");
+    const result = await collection
+      .find({
+        shop_id: shop_id,
+      })
+      .toArray();
+    client.close();
+    return result;
+  },
+  getCustomerList: async () => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("user");
+    const result = await collection.find({}).toArray();
+    client.close();
+    return result;
+  },
+  updateCustomerStatus: async (data) => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("user");
+
+    var myquery = { user_id: data.user_id };
+    var newvalues = {
+      $set: {
+        lock: data.status,
+      },
+    };
+    const result = await collection.updateOne(myquery, newvalues);
+    client.close();
+    return result;
+  },
 };
