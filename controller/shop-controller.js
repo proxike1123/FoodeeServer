@@ -1,9 +1,9 @@
 //define controller
 var { v4: uuidv4 } = require("uuid");
-var ShopModal = require("../models/shop-modal");
+var ShopModel = require("../models/shop-modal");
 module.exports = {
   shopLogin: async function (req, res) {
-    const user = await ShopModal.getShopLogin(req.body);
+    const user = await ShopModel.getShopLogin(req.body);
     if (!user) {
       return res.send({ message: "Đăng nhập thất bại" });
     }
@@ -11,15 +11,15 @@ module.exports = {
   },
 
   shopRegister: async function (req, res) {
-    const result = await ShopModal.shopRegister(req.body);
+    const result = await ShopModel.shopRegister(req.body);
     if (result && result.acknowledged) {
       return res.send({ message: "Thành công ", code: 0 });
     }
-    return res.send({ message: "Thất bại" });
+    return res.send({ message: "Thất bại", code: 1 });
   },
 
   getProfile: async function (req, res) {
-    const user = await ShopModal.getProfile(req.body.shop_id);
+    const user = await ShopModel.getProfile(req.body.shop_id);
     if (!user) {
       return res.send({ message: "Thất bại" });
     }
@@ -27,7 +27,7 @@ module.exports = {
   },
 
   getListProduct: async function (req, res) {
-    const product = await ShopModal.getListProduct(req.body.shop_id);
+    const product = await ShopModel.getListProduct(req.body.shop_id);
     if (!product) {
       return res.send({ message: "Thất bại" });
     }
@@ -53,22 +53,23 @@ module.exports = {
     };
 
     const shop_id = req.body.shop_id;
-    const result = await ShopModal.createProduct(data);
+    const result = await ShopModel.createProduct(data);
     if (result && result.acknowledged) {
-      const data = await ShopModal.getListProduct(shop_id);
+      const data = await ShopModel.getListProduct(shop_id);
       if (data.length == 0) {
-        const result = await ShopModal.updateShopAvg({ shop_id, avg: 0 });
+        const result = await ShopModel.updateShopAvg({ shop_id, avg: 0 });
       } else if (data.length == 1) {
-        const result = await ShopModal.updateShopAvg({
+        const result = await ShopModel.updateShopAvg({
           shop_id,
           avg: data[0].price,
+          products: data.length,
         });
       } else {
         let avg = 0;
         for (var i = 0; i < data.length; i++) {
           avg += Number(data[i].price);
         }
-        const result = await ShopModal.updateShopAvg({
+        const result = await ShopModel.updateShopAvg({
           shop_id,
           avg: avg / data.length,
           products: data.length,
@@ -93,17 +94,17 @@ module.exports = {
       product_id: req.body.product_id,
     };
     const shop_id = req.body.shop_id;
-    const result = await ShopModal.updateProduct(data);
+    const result = await ShopModel.updateProduct(data);
     if (result && result.acknowledged) {
-      const data = await ShopModal.getListProduct(shop_id);
+      const data = await ShopModel.getListProduct(shop_id);
       if (data.length == 0) {
-        const result = await ShopModal.updateShopAvg({
+        const result = await ShopModel.updateShopAvg({
           shop_id,
           avg: 0,
           products: data.length,
         });
       } else if (data.length == 1) {
-        const result = await ShopModal.updateShopAvg({
+        const result = await ShopModel.updateShopAvg({
           shop_id,
           avg: data[0].price,
           products: data.length,
@@ -113,7 +114,7 @@ module.exports = {
         for (var i = 0; i < data.length; i++) {
           avg += Number(data[i].price);
         }
-        const result = await ShopModal.updateShopAvg({
+        const result = await ShopModel.updateShopAvg({
           shop_id,
           avg: avg / data.length,
           products: data.length,
@@ -125,13 +126,13 @@ module.exports = {
 
   deleteProduct: async function (req, res) {
     const shop_id = req.body.shop_id;
-    const result = await ShopModal.deleteProduct(req.body.product_id);
+    const result = await ShopModel.deleteProduct(req.body.product_id);
     if (result && result.acknowledged) {
-      const data = await ShopModal.getListProduct(shop_id);
+      const data = await ShopModel.getListProduct(shop_id);
       if (data.length == 0) {
-        const result = await ShopModal.updateShopAvg({ shop_id, avg: 0 });
+        const result = await ShopModel.updateShopAvg({ shop_id, avg: 0 });
       } else if (data.length == 1) {
-        const result = await ShopModal.updateShopAvg({
+        const result = await ShopModel.updateShopAvg({
           shop_id,
           avg: data[0].price,
         });
@@ -140,7 +141,7 @@ module.exports = {
         for (var i = 0; i < data.length; i++) {
           avg += Number(data[i].price);
         }
-        const result = await ShopModal.updateShopAvg({
+        const result = await ShopModel.updateShopAvg({
           shop_id,
           avg: avg / data.length,
           products: data.length,
@@ -152,7 +153,7 @@ module.exports = {
   },
 
   getProduct: async function (req, res) {
-    const product = await ShopModal.getProduct(req.body.product_id);
+    const product = await ShopModel.getProduct(req.body.product_id);
     if (!product) {
       return res.send({ message: "Thất bại" });
     }
@@ -175,7 +176,7 @@ module.exports = {
       avatar: url != "" ? url : req.body.avatar,
     };
 
-    const result = await ShopModal.updateProfile(data);
+    const result = await ShopModel.updateProfile(data);
     if (result && result.acknowledged) {
       return res.send({ message: "Cập nhật thành công", code: 0 });
     }

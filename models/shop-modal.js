@@ -24,29 +24,36 @@ module.exports = {
       .update(salt + password)
       .digest("hex");
     await client.connect();
+
     const collection = client.db("FoodeeDatabase").collection("agency");
-    const query = {
-      email: username,
-      password: hashPassword,
-      phone: "",
-      active_time: {
-        date: [false, false, false, false, false, false, false],
-        from: "00:00",
-        to: "00:00",
-      },
-      address: "",
-      avatar: "",
-      avg_price: 0,
-      shop_name: "",
-      shop_id: uuidv4(),
-      info: false,
-      lock: false,
-      products: 0,
-    };
-    const result = await collection.insertOne(query);
-    console.log(result);
+    const arr = await collection.find({ email: username }).toArray();
+    if ((arr.length = 0)) {
+      const query = {
+        email: username,
+        password: hashPassword,
+        phone: "",
+        active_time: {
+          date: [false, false, false, false, false, false, false],
+          from: "00:00",
+          to: "00:00",
+        },
+        address: "",
+        avatar: "",
+        avg_price: 0,
+        shop_name: "",
+        shop_id: uuidv4(),
+        info: false,
+        lock: false,
+        products: 0,
+        rating: 0,
+        num_rate: 0,
+      };
+      client.close();
+      const result = await collection.insertOne(query);
+      return result;
+    }
     client.close();
-    return result;
+    return { acknowledged: false };
   },
   getProfile: async (shop_id) => {
     await client.connect();
