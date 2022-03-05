@@ -21,15 +21,16 @@ module.exports = {
     return result;
   },
   shopRegister: async ({ username, password }) => {
+    await client.connect();
     var hashPassword = crypto
       .createHash("md5")
       .update(salt + password)
       .digest("hex");
-    await client.connect();
-
     const collection = client.db("FoodeeDatabase").collection("agency");
+    console.log(collection);
     const arr = await collection.find({ email: username }).toArray();
-    if ((arr.length = 0)) {
+    console.log(arr);
+    if (arr.length == 0) {
       const query = {
         email: username,
         password: hashPassword,
@@ -50,7 +51,6 @@ module.exports = {
         rating: 0,
         num_rate: 0,
       };
-      client.close();
       const result = await collection.insertOne(query);
       return result;
     }

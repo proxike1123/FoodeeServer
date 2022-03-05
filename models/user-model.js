@@ -62,7 +62,6 @@ module.exports = {
         fcm: "",
       };
       const result = await collection.insertOne(query);
-      client.close();
       return result;
     }
     client.close();
@@ -147,7 +146,9 @@ module.exports = {
     const collection = client.db("FoodeeDatabase").collection("product");
     const collection2 = client.db("FoodeeDatabase").collection("agency");
     const collection3 = client.db("FoodeeDatabase").collection("order");
-    const orders = await collection3.find({ user_id: user_id }).toArray();
+    const orders = await collection3
+      .find({ user_id: user_id, status: "Đã hoàn tất" })
+      .toArray();
     const arr = [];
     orders.map((item) => {
       item.product.map((i) => {
@@ -181,6 +182,12 @@ module.exports = {
       var reProduct = JSON.stringify(sortProdcut);
       var reOrder = JSON.stringify(listOrder);
       recoment = await recommendations(reOrder, reProduct);
+      const listReID = recoment.map((item) => item.product_id);
+      let addList = [];
+      products.map((item) =>
+        listReID.indexOf(item.product_id) < 0 ? addList.push(item) : null
+      );
+      recoment = [...recoment, ...addList];
     }
     client.close();
     return {
