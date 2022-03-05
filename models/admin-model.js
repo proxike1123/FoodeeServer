@@ -79,4 +79,16 @@ module.exports = {
     client.close();
     return result;
   },
+  getShopReview: async ({ shop_id }) => {
+    console.log(shop_id);
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("rating");
+    const result = await collection
+      .find({
+        shop_id: shop_id,
+      })
+      .toArray();
+    client.close();
+    return result;
+  },
 };

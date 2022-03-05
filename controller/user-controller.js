@@ -1,6 +1,6 @@
 //define controller
 
-var UserModel = require("../models/user-modal");
+var UserModel = require("../models/user-model");
 module.exports = {
   userLogin: async function (req, res) {
     const user = await UserModel.getUserLogin(req.body);
@@ -89,6 +89,71 @@ module.exports = {
   },
   getFavourite: async function (req, res) {
     const result = await UserModel.getFavourite(req.body);
+    if (result) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+        data: result,
+      });
+    }
+  },
+  createOrder: async function (req, res) {
+    const result = await UserModel.createOrder(req.body);
+    if (result && result.acknowledged) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+      });
+    }
+  },
+  getOrder: async function (req, res) {
+    const result = await UserModel.getOrder(req.body);
+    if (result) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+        data: result,
+      });
+    }
+  },
+  getOrderDetail: async function (req, res) {
+    const result = await UserModel.getOrderDetail(req.body);
+    if (result) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+        data: result,
+      });
+    }
+  },
+  cancelOrder: async function (req, res) {
+    const result = await UserModel.cancelOrder(req.body);
+    if (result && result.acknowledged) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+      });
+    }
+  },
+  insertReview: async function (req, res) {
+    let url = "";
+    if (req.file && req.file.filename) {
+      url =
+        req.protocol + "://" + req.get("host") + "/images/" + req.file.filename;
+    }
+    const data = {
+      ...req.body,
+      star: Number(req.body.star),
+      image: url != "" ? url : "",
+      reply: "",
+    };
+    const result = await UserModel.insertReview(data);
+    if (result && result.acknowledged) {
+      return res.send({ message: "Cập nhật thành công", code: 0 });
+    }
+  },
+  search: async function (req, res) {
+    const result = await UserModel.search(req.body);
     if (result) {
       return res.send({
         message: "Cập nhật thành công",

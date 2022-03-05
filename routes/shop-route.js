@@ -55,5 +55,10 @@ router.post(
   shopController.updateProduct
 );
 router.post("/deleteProduct", shopController.deleteProduct);
+router.post("/getOrder", shopController.getOrder);
+router.post("/getOrderDetail", shopController.getOrderDetail);
+router.post("/changeOrderStatus", shopController.changeOrderStatus);
+router.post("/getReview", shopController.getReview);
+router.post("/updateReply", shopController.updateReply);
 
 module.exports = router;

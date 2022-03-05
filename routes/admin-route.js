@@ -12,5 +12,6 @@ router.post("/getShopDetail", adminController.getShopDetail);
 router.post("/getShopProduct", adminController.getShopProduct);
 router.get("/getCustomerList", adminController.getCustomerList);
 router.post("/updateCustomerStatus", adminController.updateCustomerStatus);
+router.post("/getShopReview", adminController.getShopReview);
 
 module.exports = router;

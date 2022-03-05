@@ -1,6 +1,6 @@
 //define controller
 var { v4: uuidv4 } = require("uuid");
-var ShopModel = require("../models/shop-modal");
+var ShopModel = require("../models/shop-model");
 module.exports = {
   shopLogin: async function (req, res) {
     const user = await ShopModel.getShopLogin(req.body);
@@ -179,6 +179,54 @@ module.exports = {
     const result = await ShopModel.updateProfile(data);
     if (result && result.acknowledged) {
       return res.send({ message: "Cập nhật thành công", code: 0 });
+    }
+  },
+  getOrder: async function (req, res) {
+    const result = await ShopModel.getOrder(req.body);
+    if (result) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+        data: result,
+      });
+    }
+  },
+  getOrderDetail: async function (req, res) {
+    const result = await ShopModel.getOrderDetail(req.body);
+    if (result) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+        data: result,
+      });
+    }
+  },
+  changeOrderStatus: async function (req, res) {
+    const result = await ShopModel.changeOrderStatus(req.body);
+    if (result && result.acknowledged) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+      });
+    }
+  },
+  getReview: async function (req, res) {
+    const result = await ShopModel.getReview(req.body);
+    if (result) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+        data: result,
+      });
+    }
+  },
+  updateReply: async function (req, res) {
+    const result = await ShopModel.updateReply(req.body);
+    if (result && result.acknowledged) {
+      return res.send({
+        message: "Cập nhật thành công",
+        code: 0,
+      });
     }
   },
 };

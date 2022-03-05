@@ -48,5 +48,11 @@ router.get("/getHomeProduct", userController.getHomeProduct);
 router.post("/getShopDetail", userController.getShopDetail);
 router.post("/updateFavourite", userController.updateFavourite);
 router.post("/getFavourite", userController.getFavourite);
+router.post("/createOrder", userController.createOrder);
+router.post("/getOrder", userController.getOrder);
+router.post("/getOrderDetail", userController.getOrderDetail);
+router.post("/cancelOrder", userController.cancelOrder);
+router.post("/review", upload.single("image"), userController.insertReview);
+router.post("/search", userController.search);
 
 module.exports = router;

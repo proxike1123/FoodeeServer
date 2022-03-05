@@ -1,6 +1,6 @@
 //define controller
 
-var AdminModal = require("../models/admin-modal");
+var AdminModal = require("../models/admin-model");
 module.exports = {
   adminLogin: async function (req, res) {
     const user = await AdminModal.getAdminLogin(req.body);
@@ -48,6 +48,13 @@ module.exports = {
     const result = await AdminModal.updateCustomerStatus(req.body);
     if (result && result.acknowledged) {
       return res.send({ message: "Thành công", code: 0 });
+    }
+    return res.send({ message: "Thất bại" });
+  },
+  getShopReview: async function (req, res) {
+    const result = await AdminModal.getShopReview(req.body);
+    if (result) {
+      return res.send({ message: "Thành công", code: 0, data: result });
     }
     return res.send({ message: "Thất bại" });
   },

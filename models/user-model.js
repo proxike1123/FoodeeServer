@@ -183,4 +183,117 @@ module.exports = {
     client.close();
     return shops;
   },
+  createOrder: async (data) => {
+    await client.connect();
+    let date_ob = new Date();
+    let date = ("0" + date_ob.getDate()).slice(-2);
+    // current month
+    let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+    // current year
+    let year = date_ob.getFullYear();
+    // current hours
+    let hours = date_ob.getHours();
+    // current minutes
+    let minutes = date_ob.getMinutes();
+    const collection = client.db("FoodeeDatabase").collection("order");
+    const item = {
+      ...data.data,
+      order_id: uuidv4(),
+      review: false,
+      status: "Chờ xác nhận",
+      time_order: date + "-" + month + "-" + year + " " + hours + ":" + minutes,
+    };
+    const result = await collection.insertOne(item);
+    client.close();
+    return result;
+  },
+  getOrder: async (data) => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("order");
+    const result = await collection.find({ user_id: data.user_id }).toArray();
+    client.close();
+    return result;
+  },
+  getOrderDetail: async (data) => {
+    console.log(data);
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("order");
+    const result = await collection.findOne({ order_id: data.order_id });
+    client.close();
+    return result;
+  },
+  cancelOrder: async (data) => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("order");
+    var newvalues = {
+      $set: {
+        status: "Hủy",
+      },
+    };
+    const result = await collection.updateOne(
+      { order_id: data.order_id },
+      newvalues
+    );
+    client.close();
+    return result;
+  },
+  insertReview: async (data) => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("rating");
+    const result = await collection.insertOne({ ...data });
+
+    const collection2 = client.db("FoodeeDatabase").collection("order");
+    var reviewStatus = {
+      $set: {
+        review: true,
+      },
+    };
+    const update = await collection2.updateOne(
+      { order_id: data.order_id },
+      reviewStatus
+    );
+
+    const collection3 = client.db("FoodeeDatabase").collection("agency");
+
+    const listReview = await collection
+      .find({ shop_id: data.shop_id })
+      .toArray();
+
+    if (listReview.length > 0) {
+      let avg = 0;
+      listReview.map((item) => (avg = avg + item.star));
+      var shopValue = {
+        $set: {
+          num_rate: listReview.length,
+          rating: avg / listReview.length,
+        },
+      };
+      const shopUpdate = await collection3.updateOne(
+        { shop_id: data.shop_id },
+        shopValue
+      );
+    }
+
+    client.close();
+    return result;
+  },
+  search: async (data) => {
+    await client.connect();
+    const collection = client.db("FoodeeDatabase").collection("product");
+    const collection2 = client.db("FoodeeDatabase").collection("agency");
+    await collection.createIndex({ name: "text" });
+    const product = await collection
+      .find({ $text: { $search: data.search } })
+      .toArray();
+    let shop = [];
+    product.map((item) => {
+      if (shop.indexOf(item.shop_id) < 0) {
+        shop.push(item.shop_id);
+      }
+    });
+    const shops = await collection2.find({ shop_id: { $in: shop } }).toArray();
+
+    client.close();
+    return { products: product, shops: shops };
+  },
 };
