@@ -44,7 +44,7 @@ router.post(
 router.post("/updatePassword", userController.updatePassword);
 router.post("/updateLocation", userController.updateLocation);
 router.post("/getNotification", userController.getNotification);
-router.get("/getHomeProduct", userController.getHomeProduct);
+router.post("/getHomeProduct", userController.getHomeProduct);
 router.post("/getShopDetail", userController.getShopDetail);
 router.post("/updateFavourite", userController.updateFavourite);
 router.post("/getFavourite", userController.getFavourite);

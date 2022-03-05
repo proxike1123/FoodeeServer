@@ -4,6 +4,17 @@ var salt =
   'd2g6IOP(U(&Â§)%UÂ§VUIPU(HN%V/Â§Â§URerjh0Ã¼rfqw4zoÃ¶qe54gÃŸ0Ã¤Q"LOU$3wer';
 var crypto = require("crypto");
 var { v4: uuidv4 } = require("uuid");
+var spawn = require("child_process").spawnSync;
+
+recommendations = async (order, product) => {
+  var result = spawn("python", ["./process.py", order, product], {
+    cwd: process.cwd(),
+    env: process.env,
+    stdio: "pipe",
+    encoding: "utf-8",
+  });
+  return JSON.parse(result.stdout);
+};
 
 module.exports = {
   getUserLogin: async ({ username, password, fcm }) => {
@@ -61,7 +72,6 @@ module.exports = {
     console.log(data);
     await client.connect();
     const collection = client.db("FoodeeDatabase").collection("user");
-
     var myquery = { user_id: data.user_id };
     var newvalues = {
       $set: {
@@ -131,13 +141,52 @@ module.exports = {
     return result;
   },
   getHomeProduct: async (data) => {
+    const user_id = data.user_id;
+
     await client.connect();
     const collection = client.db("FoodeeDatabase").collection("product");
     const collection2 = client.db("FoodeeDatabase").collection("agency");
+    const collection3 = client.db("FoodeeDatabase").collection("order");
+    const orders = await collection3.find({ user_id: user_id }).toArray();
+    const arr = [];
+    orders.map((item) => {
+      item.product.map((i) => {
+        arr.indexOf(i.product_id) < 0 ? arr.push(i.product_id) : null;
+      });
+    });
+
+    const listOrder = arr.map((item) => {
+      return { oder_id: 0, user_id: 1, product_id: item };
+    });
+
     const products = await collection.find({}).toArray();
     const shops = await collection2.find({}).toArray();
+
+    const sortProdcut = products.map((item) => {
+      return {
+        product_id: item.product_id,
+        name: item.name,
+        price: item.price,
+        avatar: item.avatar,
+        cate_id: item.cate_id,
+        sale: item.sale,
+        tag: item.tag,
+        shop_id: item.shop_id,
+        _id: item._id,
+      };
+    });
+    let recoment = [];
+
+    if (listOrder.length > 0) {
+      var reProduct = JSON.stringify(sortProdcut);
+      var reOrder = JSON.stringify(listOrder);
+      recoment = await recommendations(reOrder, reProduct);
+    }
     client.close();
-    return { products: products, shops: shops };
+    return {
+      products: listOrder.length > 0 ? recoment : products,
+      shops: shops,
+    };
   },
   getShopDetail: async (data) => {
     await client.connect();
