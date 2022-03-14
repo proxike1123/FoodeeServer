@@ -110,12 +110,21 @@ module.exports = {
     client.close();
     return result;
   },
-  getListProduct: async (shop_id) => {
+  getListProduct: async (shop_id, search) => {
+    console.log("day", shop_id);
+    console.log("day", search);
     await client.connect();
-    const collection = client.db("FoodeeDatabase").collection("product");
-    const query = { shop_id: shop_id };
-    const result = await collection.find(query).toArray();
-
+    let result = null;
+    if (!search || search == "") {
+      const collection = client.db("FoodeeDatabase").collection("product");
+      const query = { shop_id: shop_id };
+      result = await collection.find(query).toArray();
+    } else {
+      const collection = client.db("FoodeeDatabase").collection("product");
+      await collection.createIndex({ name: "text" });
+      const query = { shop_id: shop_id, $text: { $search: search } };
+      result = await collection.find(query).toArray();
+    }
     client.close();
     return result;
   },

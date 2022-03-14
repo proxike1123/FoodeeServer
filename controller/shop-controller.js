@@ -27,7 +27,10 @@ module.exports = {
   },
 
   getListProduct: async function (req, res) {
-    const product = await ShopModel.getListProduct(req.body.shop_id);
+    const product = await ShopModel.getListProduct(
+      req.body.shop_id,
+      req.body.search
+    );
     if (!product) {
       return res.send({ message: "Thất bại" });
     }
