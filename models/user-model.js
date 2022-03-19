@@ -180,7 +180,7 @@ module.exports = {
 
     if (listOrder.length > 0) {
       var reProduct = JSON.stringify(sortProdcut);
-      var reOrder = JSON.stringify(listOrder);
+      var reOrder = JSON.stringify(listOrder.reverse());
       recoment = await recommendations(reOrder, reProduct);
       const listReID = recoment.map((item) => item.product_id);
       let addList = [];
